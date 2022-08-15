@@ -11,7 +11,8 @@ async fn main() {
     let app = Router::new()
         // `GET /` goes to `root`
         .route("/works", get(works))
-        .route("/fails", get(fails));
+        .route("/fails", get(fails))
+        .route("/also-fails", get(also_fails));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     axum::Server::bind(&addr)
@@ -34,6 +35,19 @@ async fn works() -> &'static str {
 }
 
 async fn fails() -> &'static str {
+    info!("Starting fails request");
+    let ten_millis = time::Duration::from_secs(3);
+
+    thread::sleep(ten_millis);
+    info!("Ending fails request");
+    "Delayed Hello, World!"
+}
+
+async fn also_fails() -> &'static str {
+    tokio::spawn(async_wait()).await.unwrap()
+}
+
+async fn async_wait() -> &'static str {
     info!("Starting fails request");
     let ten_millis = time::Duration::from_secs(3);
 
